@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <conio.h> 
 
+
 using namespace std;
 
 enum MazeObject { HALL = 0, WALL = 1, WALLTWO = 2, WALLTHREE = 3, ENEMY = 4, BOMB = 5, HEALTH = 6 };
@@ -10,6 +11,83 @@ enum MazeObject { HALL = 0, WALL = 1, WALLTWO = 2, WALLTHREE = 3, ENEMY = 4, BOM
 enum Color { DARKGREEN = 2, YELLOW = 14, RED = 12, BLUE = 9, WHITE = 15, DARKYELLOW = 6, DARKRED = 4, PURPLE = 13, GREEN = 10 };
 
 enum KeyCode { ENTER = 13, ESCAPE = 27, SPACE = 32, LEFT = 75, RIGHT = 77, UP = 72, DOWN = 80 };
+
+
+class Menu {
+private:
+    const int NUM_MENU_ITEMS = 3;
+    int ActiveMenuItem = 0; //Выбранный пункт меню
+    int ch = 0; //Хранение нажатой клавиши
+    bool exit = false; // для выхода из цикла
+public:
+    void gotoxy(int x, int y) {
+        COORD coord;
+        coord.X = x;
+        coord.Y = y;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    }
+
+    //Само меню  основа
+    void Menushka() {
+        system("color F0");
+        system("cls");
+
+        while (!exit) {
+            ShowMenu();
+            gotoxy(0, ActiveMenuItem);
+
+            ch = _getch();
+            if (ch == 224)
+                ch = _getch();
+
+            switch (ch) {
+            case 27: // Стрелка вверх
+                exit = true;
+                break;
+            case 72: // Стрелка вверх
+                ActiveMenuItem = (ActiveMenuItem - 1 + NUM_MENU_ITEMS) % NUM_MENU_ITEMS;
+                break;
+            case 80: //Стрелка вниз
+                ActiveMenuItem = (ActiveMenuItem + 1) % NUM_MENU_ITEMS;
+                break;
+            case 13: // Клавиша Энтер
+                if (ActiveMenuItem == 0) {
+                    
+                }
+                else if (ActiveMenuItem == 1) { // Об авторе кнопка
+                    AboutAutors();
+                }
+                else if (ActiveMenuItem == 2) { // Кнопка выход из игры
+                    exit = true;
+                }
+                break;
+            }
+        }
+    }
+
+    //Вывод лого
+    void ShowLogo() {
+        gotoxy(50, 15);
+        cout << "BOMBERMAN!!!" << "\n";
+        Sleep(1000);
+    }
+
+    // Вывод меню
+    void ShowMenu() {
+        system("cls");
+        cout << "Start game" << "\n";
+        cout << "About autors" << "\n";
+        cout << "Exit" << "\n";
+    }
+
+    //Про нас
+    void AboutAutors() {
+        system("cls");
+        cout << "Bienoieva Malika" << "\n" << "Lolo Mukhammed";
+        system("pause");
+    }
+};
+
 
 // Класс приложение
 class Application {
@@ -24,12 +102,6 @@ public:
         SetConsoleCursorInfo(h, &ci);
     }
 };
-
-class Menu {
-public:
-    // Здесь добавить меню
-};
-
 
 
 class Maze {
@@ -485,6 +557,11 @@ public:
 
 int main() {
     srand(time(NULL));
+
+    Menu menu;
+    menu.ShowLogo();
+    menu.Menushka();
+
     Application app;
     app.Applicatioon();
 
