@@ -229,6 +229,8 @@ public:
     int height;
     int width;
 
+    BombermanGame() {}
+
     // Метод для генерации начального состояния игры
     void Generation() {
         for (int y = 0; y < height; y++) {
@@ -500,7 +502,7 @@ int main() {
     wall.WallsInsideTheMapThree(maze.layout, maze.width, maze.height);
 
     BombermanGame bomber;
-
+    bomber.Person(2, 2);
 
     return 0;
 };
