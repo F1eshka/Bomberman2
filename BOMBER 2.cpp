@@ -1,24 +1,41 @@
 #include <iostream>
 #include <ctime>
-#include <Windows.h>
+#include <windows.h>
 #include <conio.h> 
-
-
 using namespace std;
 
 enum MazeObject { HALL = 0, WALL = 1, WALLTWO = 2, WALLTHREE = 3, ENEMY = 4, BOMB = 5, HEALTH = 6 };
-
 enum Color { DARKGREEN = 2, YELLOW = 14, RED = 12, BLUE = 9, WHITE = 15, DARKYELLOW = 6, DARKRED = 4, PURPLE = 13, GREEN = 10 };
-
 enum KeyCode { ENTER = 13, ESCAPE = 27, SPACE = 32, LEFT = 75, RIGHT = 77, UP = 72, DOWN = 80 };
 
+// Класс приложения
+class Application {
+public:
+    static HANDLE h;
+    static CONSOLE_CURSOR_INFO ci;
+
+    static void Start() {
+        MoveWindow(GetConsoleWindow(), 50, 50, 1200, 500, true);
+        system("title Bomberman");
+        srand(time(NULL));
+
+        h = GetStdHandle(STD_OUTPUT_HANDLE);
+        ci.bVisible = false;
+        ci.dwSize = 100;
+        SetConsoleCursorInfo(h, &ci);
+    }
+    Application() = delete;
+};
+
+HANDLE Application::h;
+CONSOLE_CURSOR_INFO Application::ci;
 
 class Menu {
-private:
     const int NUM_MENU_ITEMS = 3;
-    int ActiveMenuItem = 0; //Выбранный пункт меню
-    int ch = 0; //Хранение нажатой клавиши
+    int ActiveMenuItem = 0; // Выбранный пункт меню
+    int ch = 0; // Хранение нажатой клавиши
     bool exit = false; // для выхода из цикла
+
 public:
     void gotoxy(int x, int y) {
         COORD coord;
@@ -27,8 +44,11 @@ public:
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
     }
 
-    //Само меню  основа
+    // Само меню основа
     void Menushka() {
+        Application::ci.bVisible = true;
+        SetConsoleCursorInfo(Application::h, &Application::ci);
+
         system("color F0");
         system("cls");
 
@@ -52,20 +72,23 @@ public:
                 break;
             case 13: // Клавиша Энтер
                 if (ActiveMenuItem == 0) {
-                    
+                    system("cls"); // !!!!!!!!!!!!!!!!!!!
+                    cout << "NEW GAME\n";
+                    Sleep(1000);
+                    return;
                 }
                 else if (ActiveMenuItem == 1) { // Об авторе кнопка
-                    AboutAutors();
+                    AboutAuthors();
                 }
                 else if (ActiveMenuItem == 2) { // Кнопка выход из игры
-                    exit = true;
+                    ::exit(0);
                 }
                 break;
             }
         }
     }
 
-    //Вывод лого
+    // Вывод лого
     void ShowLogo() {
         gotoxy(50, 15);
         cout << "BOMBERMAN!!!" << "\n";
@@ -76,30 +99,15 @@ public:
     void ShowMenu() {
         system("cls");
         cout << "Start game" << "\n";
-        cout << "About autors" << "\n";
+        cout << "About authors" << "\n";
         cout << "Exit" << "\n";
     }
 
-    //Про нас
-    void AboutAutors() {
+    // Про нас
+    void AboutAuthors() {
         system("cls");
-        cout << "Bienoieva Malika" << "\n" << "Lolo Mukhammed";
+        cout << "Bienoieva Malika" << "\n" << "Lolo Mukhammed\n\n\n\n";
         system("pause");
-    }
-};
-
-
-// Класс приложение
-class Application {
-public:
-    HANDLE h;
-    CONSOLE_CURSOR_INFO ci;
-
-    void Applicatioon() {
-        h = GetStdHandle(STD_OUTPUT_HANDLE);
-        ci.bVisible = false;
-        ci.dwSize = 100;
-        SetConsoleCursorInfo(h, &ci);
     }
 };
 
@@ -143,10 +151,10 @@ public:
 
 // Класс, представляющий стены на карте лабиринта
 class Wall {
-private:
     int width;
     int height;
     int** bomber = nullptr;
+
 public:
     HANDLE h;
 
@@ -554,16 +562,12 @@ public:
     }
 };
 
-
 int main() {
-    srand(time(NULL));
+    Application::Start();
 
     Menu menu;
     menu.ShowLogo();
     menu.Menushka();
-
-    Application app;
-    app.Applicatioon();
 
     Maze maze(61, 17);
     maze.GenerateLayout();
@@ -580,6 +584,4 @@ int main() {
 
     BombermanGame bomber;
     bomber.Person(2, 2);
-
-    return 0;
-};
+}
